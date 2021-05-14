@@ -1,0 +1,49 @@
+{
+  "extends": "eslint:recommended",
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "sourceType": "module",
+    "requireConfigFile": false
+  },
+  "ignorePatterns": ["**/dist", "**/worker", "**/node_modules"],
+  "overrides": [
+    {
+      "files": ["nginx/*"],
+      "globals": {
+        "ngx": true,
+        "Buffer": true
+      }
+    },
+    {
+      "files": ["scriptable/*"],
+      "globals": {
+        "console": true,
+        "FileManager": true,
+        "ListWidget": true,
+        "Color": true,
+        "Font": true,
+        "config": true,
+        "Speech": true,
+        "importModule": true,
+        "module": true
+      }
+    },
+    {
+      "files": ["jxa/*"],
+      "globals": {
+        "Application": true,
+        "module": true
+      }
+    },
+    {
+      "files": ["cloudflare/*"],
+      "globals": {
+        "fetch": true,
+        "addEventListener": true,
+        "URL": true,
+        "Response": true,
+        "console": true
+      }
+    }
+  ]
+}

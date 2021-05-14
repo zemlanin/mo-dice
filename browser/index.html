@@ -1,0 +1,42 @@
+<style>
+  #last-roll { font-size: 4em; margin: 0.25em; }
+  #log li { display: inline-block; font-size: 2em; margin-right: 0.5em; }
+</style>
+
+<h1 id="last-roll">⚃</h1>
+<button id="roll">🔄</button>
+<button id="clear">🚮</button>
+<ul id="log"></ul>
+
+<script type="module">
+  import Core from './core.js';
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const core = new Core({symbols: '123456'.split('')});
+
+    function render(core) {
+      const lastRoll = document.querySelector("#last-roll")
+      const log = document.querySelector("#log")
+
+      lastRoll.innerHTML = core.pretty().lastRoll;
+      lastRoll.style.transform =
+        `translate(${(Math.random() - 0.5) / 2}em, ${(Math.random() - 0.5) / 2}em)`;
+
+      log.innerHTML = core.pretty().history
+        .map((v) => `<li>${v}</li>`)
+        .join("");
+    }
+
+    document.querySelector("#roll").onclick = () => {
+      core.roll();
+      render(core);
+    };
+
+    document.querySelector("#clear").onclick = () => {
+      core.clear();
+      render(core);
+    };
+
+    render(core);
+  });
+</script>
