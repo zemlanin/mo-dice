@@ -8,39 +8,52 @@ addEventListener("fetch", function (event) {
 });
 
 async function handleRequest(request) {
+  let response, core;
+
   switch (new URL(request.url).pathname) {
     case "/":
-      return respondRoll(request);
+      core = load(request);
+      core.roll();
+      response =
+        core.lastRoll === 0 ? await luckyResponse() : rollAgainResponse(core);
+      break;
+
     case "/clear":
-      return respondClear(request);
+      core = load(request);
+      core.clear();
+      response = clearResponse();
+      break;
+  }
+
+  if (response) {
+    return save(core, response);
   }
 
   return new Response(null, { status: 204 });
 }
 
-function applyHeaders(resp, core) {
-  const headerFriendlyCore = new Core({
-    ...core,
-    symbols: ["[1]", "[2]", "[3]", "[4]", "[5]", "[6]"],
+function handleError(error) {
+  console.error("Uncaught error:", error);
+
+  const { stack } = error;
+  return new Response(stack || error, {
+    status: 500,
+    headers: {
+      "Content-Type": "text/plain;charset=UTF-8",
+    },
   });
-  resp.headers.set("Modice-Last-Roll", headerFriendlyCore.pretty().lastRoll);
-  resp.headers.set("Set-Cookie", serialize(core));
 }
 
-async function respondRoll(request) {
-  const core = load(request);
+async function luckyResponse() {
+  return (
+    fetch("https://zemlan.in/")
+      // create mutable `Response` based on fetch's unmutable one
+      .then((response) => new Response(response.body, response))
+  );
+}
 
-  core.roll();
-
-  if (core.lastRoll === 0) {
-    return fetch("https://zemlan.in/").then((resp) => {
-      resp = new Response(resp.body, resp);
-      applyHeaders(resp, core);
-      return resp;
-    });
-  }
-
-  const resp = new Response(
+function rollAgainResponse(core) {
+  return new Response(
     `<title>Try Again</title>
       <style>body {text-align: center} code {font-size: 80px} a {display: block}</style>
       <img src="https://http.cat/403" width="403">
@@ -54,36 +67,13 @@ async function respondRoll(request) {
       },
     }
   );
-
-  applyHeaders(resp, core);
-  return resp;
 }
 
-async function respondClear(request) {
-  const core = load(request);
-  core.clear();
-
-  const resp = new Response(null, {
+function clearResponse() {
+  return new Response(null, {
     status: 303,
     headers: {
-      Location: new URL("/", request.url).toString(),
-      "Set-Cookie": serialize(core),
-    },
-  });
-
-  resp.headers.set("Set-Cookie", serialize(core));
-
-  return resp;
-}
-
-function handleError(error) {
-  console.error("Uncaught error:", error);
-
-  const { stack } = error;
-  return new Response(stack || error, {
-    status: 500,
-    headers: {
-      "Content-Type": "text/plain;charset=UTF-8",
+      Location: "/",
     },
   });
 }
@@ -100,6 +90,19 @@ function load(request) {
   return new Core();
 }
 
-function serialize(core) {
-  return cookie.serialize("modice", JSON.stringify(core), { httpOnly: true });
+function save(core, response) {
+  const headerFriendlyCore = new Core({
+    ...core,
+    symbols: ["[1]", "[2]", "[3]", "[4]", "[5]", "[6]"],
+  });
+  response.headers.set(
+    "Modice-Last-Roll",
+    headerFriendlyCore.pretty().lastRoll
+  );
+  response.headers.set(
+    "Set-Cookie",
+    cookie.serialize("modice", JSON.stringify(core), { httpOnly: true })
+  );
+
+  return response;
 }
