@@ -1,30 +1,33 @@
 <style>
-  #last-roll { font-size: 4em; margin: 0.25em; }
+  body { max-width: 12em; margin: 1em auto; }
+  #last-roll { font-size: 4em; margin: 0.5em; }
+  #log { padding: 0; }
   #log li { display: inline-block; font-size: 2em; margin-right: 0.5em; }
 </style>
 
 <!-- https://xkcd.com/221/ -->
 <h1 id="last-roll">⚃</h1>
-<button id="roll">🔄</button>
-<button id="clear">🚮</button>
-<ul id="log"></ul>
+<button id="roll" hidden>🔄</button>
+<button id="clear" hidden>🚮</button>
+<ul id="log" hidden></ul>
 
 <script type="module">
-  import Core from './core.js';
+  import Core from "./core.js";
 
   document.addEventListener("DOMContentLoaded", function () {
-    const core = new Core({symbols: '123456'.split('')});
+    const core = new Core();
+
+    const lastRoll = document.querySelector("#last-roll");
+    const log = document.querySelector("#log");
 
     function render(core) {
-      const lastRoll = document.querySelector("#last-roll")
-      const log = document.querySelector("#log")
-
       lastRoll.innerHTML = core.pretty().lastRoll;
       lastRoll.style.transform =
-        `translate(${(Math.random() - 0.5) / 2}em, ${(Math.random() - 0.5) / 2}em)`;
+        `translate(${Math.random() - 0.5}em, ${Math.random() - 0.5}em)`;
 
-      log.innerHTML = core.pretty().history
-        .map((v) => `<li>${v}</li>`)
+      log.innerHTML = core
+        .pretty()
+        .history.map((v) => `<li>${v}</li>`)
         .join("");
     }
 
@@ -37,6 +40,10 @@
       core.clear();
       render(core);
     };
+
+    for (const el of document.querySelectorAll("[hidden]")) {
+      el.hidden = false;
+    }
 
     render(core);
   });
