@@ -20,11 +20,13 @@
     const lastRoll = document.querySelector("#last-roll");
     const log = document.querySelector("#log");
 
-    function render(core) {
+    function renderRoll(core) {
       lastRoll.innerHTML = core.pretty().lastRoll;
       lastRoll.style.transform =
         `translate(${Math.random() - 0.5}em, ${Math.random() - 0.5}em)`;
+    }
 
+    function renderHistory(core) {
       log.innerHTML = core
         .pretty()
         .history.map((v) => `<li>${v}</li>`)
@@ -33,18 +35,17 @@
 
     document.querySelector("#roll").onclick = () => {
       core.roll();
-      render(core);
+      renderRoll(core);
+      renderHistory(core);
     };
 
     document.querySelector("#clear").onclick = () => {
       core.clear();
-      render(core);
+      renderHistory(core);
     };
 
     for (const el of document.querySelectorAll("[hidden]")) {
       el.hidden = false;
     }
-
-    render(core);
   });
 </script>
