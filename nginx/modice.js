@@ -15,41 +15,51 @@ function save(r, core) {
   )}`;
 }
 
+function luckyResponse(r) {
+  // Only the `http://` scheme is supported, redirects are not handled
+  ngx
+    .fetch("http://zemlan.in/", {
+      max_response_body_size: 64 * 1024,
+    })
+    .then((reply) => {
+      return reply.text().then((body) => {
+        // no headers merging?
+        r.headersOut["Content-Type"] = reply.headers.get("Content-Type");
+        r.return(reply.status, body);
+      });
+    })
+    .catch((e) => r.return(500, e.toString()));
+}
+
+function rollAgainResponse(r, core) {
+  r.headersOut["Content-Type"] = "text/html; charset=utf-8";
+
+  r.return(
+    403,
+    `<title>Try Again</title>
+    <style>body {text-align: center} code {font-size: 80px} a {display: block}</style>
+    <img src="https://http.cat/403" width="403">
+    <hr>
+    <code>${core.pretty().history.join(" ")}</code>
+    <a href="/clear">🚮</a>`
+  );
+}
+
 function index(r) {
-  var core = load();
+  var core = load(r);
 
   core.roll();
 
   save(r, core);
 
-  r.headersOut["Content-Type"] = "text/html; charset=utf-8";
-  r.headersOut["Modice-Last-Roll"] = new Core({
-    ...core,
-    symbols: ["[1]", "[2]", "[3]", "[4]", "[5]", "[6]"],
-  }).pretty().lastRoll;
+  r.headersOut["Modice-Last-Roll"] = ["[1]", "[2]", "[3]", "[4]", "[5]", "[6]"][
+    core.lastRoll
+  ];
 
-  var gotLucky = core.lastRoll === 0;
-
-  if (gotLucky) {
-    // Only the `http://` scheme is supported, redirects are not handled
-    ngx
-      .fetch("http://zemlan.in/")
-      .then((reply) => {
-        r.headersOut["Content-Type"] = reply.headers.get("Content-Type");
-        return reply.text();
-      })
-      .then((body) => r.return(200, body))
-      .catch((e) => r.return(500, e.toString()));
+  if (core.lastRoll === 0) {
+    luckyResponse(r);
   } else {
-    // debug
-    r.return(
-      403,
-      `<title>Try Again</title>
-      <style>body {font-size: 80px; text-align: center}</style>
-      <img src="https://http.cat/403" width="403">
-      <hr>
-      <code>${core.pretty().history.join(" ")}</code>`
-    );
+    rollAgainResponse(r, core);
   }
 }
 
