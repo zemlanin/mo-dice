@@ -4,7 +4,7 @@ set -euxo pipefail
 
 cd `dirname $0`
 
-docker rm mo-dice-nginx
+docker rm mo-dice-nginx || true
 
 docker run \
   --name mo-dice-nginx \
