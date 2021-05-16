@@ -1,4 +1,4 @@
-import Core from "./core.nginx.js";
+import Core from "./core.js";
 
 function load(r) {
   try {

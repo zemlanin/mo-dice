@@ -1,5 +1,5 @@
 // no const, but does have arrow functions
-var R = (symbols) => symbols[parseInt(Math.random() * symbols.length)];
+var R = (n) => parseInt(Math.random() * n);
 
 // no class
 function Core(options) {
