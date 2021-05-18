@@ -15,13 +15,19 @@ async function handleRequest(request) {
       core = load(request);
       core.roll();
       response =
-        core.lastRoll === 0 ? await luckyResponse() : rollAgainResponse(core);
+        core.lastRoll === 0
+          ? await luckyResponse()
+          : rollAgainResponse(core);
+      response.headers.set(
+        "Modice-Last-Roll",
+        ["[1]", "[2]", "[3]", "[4]", "[5]", "[6]"][core.lastRoll]
+      );
       break;
 
     case "/clear":
       core = load(request);
       core.clear();
-      response = clearResponse();
+      response = clearResponse(request);
       break;
   }
 
@@ -69,11 +75,11 @@ function rollAgainResponse(core) {
   );
 }
 
-function clearResponse() {
+function clearResponse(request) {
   return new Response(null, {
     status: 303,
     headers: {
-      Location: "/",
+      Location: request.headers.get("Referer"),
     },
   });
 }
@@ -91,14 +97,6 @@ function load(request) {
 }
 
 function save(core, response) {
-  const headerFriendlyCore = new Core({
-    ...core,
-    symbols: ["[1]", "[2]", "[3]", "[4]", "[5]", "[6]"],
-  });
-  response.headers.set(
-    "Modice-Last-Roll",
-    headerFriendlyCore.pretty().lastRoll
-  );
   response.headers.set(
     "Set-Cookie",
     cookie.serialize("modice", JSON.stringify(core), { httpOnly: true })
