@@ -70,7 +70,7 @@ function clear(r) {
 
   save(r, core);
 
-  r.return(303, "/");
+  r.return(303, r.headersIn.referer);
 }
 
 export default { index, clear };
