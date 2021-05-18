@@ -4,7 +4,7 @@ function load(r) {
   try {
     return new Core(JSON.parse(decodeURIComponent(r.variables.cookie_modice)));
   } catch (e) {
-    //
+    ngx.log(ngx.ERR, e);
   }
   return new Core();
 }
