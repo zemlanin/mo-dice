@@ -1,7 +1,6 @@
 ```sh
-npm i -g @cloudflare/wrangler
+npm install -g @cloudflare/wrangler@beta
 wrangler login
-wrangler init
-# update `account_id` in fresh `wrangler.toml` (see previous step's output for details)
-wrangler publish
+# see previous step's output for `CF_ACCOUNT_ID` value
+env CF_ACCOUNT_ID=[see previous step's output] wrangler publish
 ```
