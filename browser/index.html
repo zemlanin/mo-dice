@@ -1,12 +1,12 @@
 <style>
   body { max-width: 12em; margin: 1em auto; }
-  #last-roll { font-size: 4em; margin: 0.5em; }
+  #lastRoll { font-size: 4em; margin: 0.5em; }
   #log { padding: 0; }
   #log li { display: inline-block; font-size: 2em; margin-right: 0.5em; }
 </style>
 
 <!-- https://xkcd.com/221/ -->
-<h1 id="last-roll">⚃</h1>
+<h1 id="lastRoll">⚃</h1>
 <button id="roll" hidden>🔄</button>
 <button id="clear" hidden>🚮</button>
 <ul id="log" hidden></ul>
@@ -17,7 +17,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     const core = new Core();
 
-    const lastRoll = document.querySelector("#last-roll");
+    const lastRoll = document.querySelector("#lastRoll");
     const log = document.querySelector("#log");
 
     function renderRoll(core) {
