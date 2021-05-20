@@ -7,45 +7,37 @@
 
 <!-- https://xkcd.com/221/ -->
 <h1 id="lastRoll">⚃</h1>
-<button id="roll" hidden>🔄</button>
-<button id="clear" hidden>🚮</button>
-<ul id="log" hidden></ul>
+<button id="roll">🔄</button>
+<button id="clear">🚮</button>
+<ul id="log"></ul>
 
 <script type="module">
   import Core from "./core.js";
 
-  document.addEventListener("DOMContentLoaded", function () {
-    const core = new Core();
+  const core = new Core();
 
+  function renderRoll(core) {
     const lastRoll = document.querySelector("#lastRoll");
-    const log = document.querySelector("#log");
+    lastRoll.innerHTML = core.pretty().lastRoll;
+    lastRoll.style.transform =
+      `translate(${Math.random() - 0.5}em, ${Math.random() - 0.5}em)`;
+  }
 
-    function renderRoll(core) {
-      lastRoll.innerHTML = core.pretty().lastRoll;
-      lastRoll.style.transform =
-        `translate(${Math.random() - 0.5}em, ${Math.random() - 0.5}em)`;
-    }
+  function renderHistory(core) {
+    document.querySelector("#log").innerHTML = core
+      .pretty()
+      .history.map((v) => `<li>${v}</li>`)
+      .join("");
+  }
 
-    function renderHistory(core) {
-      log.innerHTML = core
-        .pretty()
-        .history.map((v) => `<li>${v}</li>`)
-        .join("");
-    }
+  document.querySelector("#roll").addEventListener("click", () => {
+    core.roll();
+    renderRoll(core);
+    renderHistory(core);
+  });
 
-    document.querySelector("#roll").onclick = () => {
-      core.roll();
-      renderRoll(core);
-      renderHistory(core);
-    };
-
-    document.querySelector("#clear").onclick = () => {
-      core.clear();
-      renderHistory(core);
-    };
-
-    for (const el of document.querySelectorAll("[hidden]")) {
-      el.hidden = false;
-    }
+  document.querySelector("#clear").addEventListener("click", () => {
+    core.clear();
+    renderHistory(core);
   });
 </script>

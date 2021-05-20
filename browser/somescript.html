@@ -5,6 +5,10 @@
 
 <!-- https://xkcd.com/221/ -->
 <h1 id="lastRoll">⚃</h1>
-<button id="roll"
-  onclick='lastRoll.textContent = ["⚀","⚁","⚂","⚃","⚄","⚅"][parseInt(Math.random() * 6)]'
->🔄</button>
+<button id="roll">🔄</button>
+
+<script>
+  roll.onclick = function () {
+    lastRoll.innerText = ["⚀","⚁","⚂","⚃","⚄","⚅"][parseInt(Math.random() * 6)]
+  }
+</script>
