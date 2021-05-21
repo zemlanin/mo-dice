@@ -1,4 +1,3 @@
 dist/
 worker/
-wrangler.toml
 node_modules/
