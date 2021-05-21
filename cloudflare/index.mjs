@@ -14,9 +14,9 @@ export default {
       }
 
       const objectId = env.MODICE.idFromName(sessionIdFromCookie || newSessionId);
-      const obj = await env.MODICE.get(objectId);
+      const durable = await env.MODICE.get(objectId);
 
-      let response = await obj.fetch(request);
+      let response = await durable.fetch(request);
 
       if (newSessionId) {
         // create mutable `Response` based on fetch's unmutable one

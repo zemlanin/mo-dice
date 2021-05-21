@@ -6,7 +6,23 @@ export class DurableModice {
   constructor(controller, env) {
     this.controller = controller;
     this.core = null;
-    this.loadPromise = null;
+  }
+
+  async fetch(request) {
+    switch (new URL(request.url).pathname) {
+      case "/":
+        await this.load();
+        await this.core.roll();
+        await this.save();
+        return this.core.lastRoll === 0 ? await this.luckyResponse() : this.rollAgainResponse()
+      case "/clear":
+        await this.load();
+        await this.core.clear();
+        await this.save();
+        return this.clearResponse(request)
+      default:
+        return new Response(null, { status: 204 });
+    }
   }
 
   async load() {
@@ -30,56 +46,30 @@ export class DurableModice {
     await this.controller.storage.put("state", JSON.stringify(this.core));
   }
 
-  async fetch(request) {
-    if (!this.loadPromise) {
-      this.loadPromise = this.load();
-    }
-    await this.loadPromise;
-
-    switch (new URL(request.url).pathname) {
-      case "/":
-        return this.roll();
-      case "/clear":
-        return this.clear(request);
-    }
-
-    return new Response(null, { status: 204 });
+  async luckyResponse() {
+    const remoteResponse = await fetch("https://zemlan.in/")
+    // create mutable `Response` based on fetch's unmutable one
+    return new Response(remoteResponse.body, remoteResponse);
   }
 
-  async roll() {
-    this.core.roll();
-    await this.save();
-
-    let response;
-
-    if (this.core.lastRoll === 0) {
-      response = await fetch("https://zemlan.in/")
-      // create mutable `Response` based on fetch's unmutable one
-      response = new Response(response.body, response);
-    } else {
-      response = new Response(
-        `<title>Try Again</title>
-          <style>body {text-align: center} code {font-size: 80px} a {display: block}</style>
-          <img src="https://http.cat/403" width="403">
-          <hr>
-          <code>${this.core.pretty().history.join(" ")}</code>
-          <a href="/clear">🚮</a>`,
-        {
-          status: 403,
-          headers: {
-            "Content-Type": "text/html; charset=utf-8",
-          },
-        }
-      );
-    }
-
-    return response;
+  async rollAgainResponse() {
+    return new Response(
+      `<title>Try Again</title>
+        <style>body {text-align: center} code {font-size: 80px} a {display: block}</style>
+        <img src="https://http.cat/403" width="403">
+        <hr>
+        <code>${this.core.pretty().history.join(" ")}</code>
+        <a href="/clear">🚮</a>`,
+      {
+        status: 403,
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+        },
+      }
+    );
   }
 
-  async clear(request) {
-    this.core.clear();
-    await this.save();
-
+  async clearResponse(request) {
     return new Response(null, {
       status: 303,
       headers: {
