@@ -2,7 +2,14 @@ import Core from "./core.js";
 
 function load(r) {
   try {
-    return new Core(JSON.parse(decodeURIComponent(r.variables.cookie_modice)));
+    return new Core(
+      JSON.parse(
+        decodeURIComponent(
+          // using nginx's predefined `cookie_` variables
+          r.variables.cookie_modice
+        )
+      )
+    );
   } catch (e) {
     ngx.log(ngx.ERR, e);
   }
@@ -23,7 +30,6 @@ function luckyResponse(r) {
     })
     .then((reply) => {
       return reply.text().then((body) => {
-        // no headers merging?
         r.headersOut["Content-Type"] = reply.headers.get("Content-Type");
         r.return(reply.status, body);
       });
