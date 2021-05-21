@@ -8,7 +8,8 @@ function Core(options) {
   this.symbols = options.symbols || Core.symbols;
   this.lastRoll =
     typeof options.lastRoll === "number"
-      ? options.lastRoll
+      ? // 0 < options.lastRoll < this.symbols.length
+        Math.max(0, Math.min(options.lastRoll, this.symbols.length - 1))
       : R(this.symbols.length);
   this.history = options.history || [];
 }
