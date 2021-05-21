@@ -73,11 +73,6 @@ export class DurableModice {
       );
     }
 
-    response.headers.set(
-      "Modice-Last-Roll",
-      ["[1]", "[2]", "[3]", "[4]", "[5]", "[6]"][this.core.lastRoll]
-    );
-
     return response;
   }
 

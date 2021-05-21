@@ -58,10 +58,6 @@ function index(r) {
 
   save(r, core);
 
-  r.headersOut["Modice-Last-Roll"] = ["[1]", "[2]", "[3]", "[4]", "[5]", "[6]"][
-    core.lastRoll
-  ];
-
   if (core.lastRoll === 0) {
     luckyResponse(r);
   } else {
