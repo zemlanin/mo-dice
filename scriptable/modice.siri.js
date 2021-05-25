@@ -10,14 +10,28 @@ const cachePath = fileManager.joinPath(
 );
 
 function load() {
+  const symbols = [
+    "единицу",
+    "двойку",
+    "тройку",
+    "четвёрку",
+    "пятёрку",
+    "шестёрку",
+  ];
+
   if (fileManager.fileExists(cachePath)) {
     try {
-      return new Core(JSON.parse(fileManager.readString(cachePath)));
+      return new Core({
+        ...JSON.parse(fileManager.readString(cachePath)),
+        symbols,
+      });
     } catch (e) {
       console.error(e);
     }
   }
-  return new Core();
+  return new Core({
+    symbols,
+  });
 }
 
 function save(core) {
@@ -25,11 +39,6 @@ function save(core) {
 }
 
 function getSpokenRoll(core) {
-  const wordy = new Core({
-    ...core,
-    symbols: ["единицу", "двойку", "тройку", "четвёрку", "пятёрку", "шестёрку"],
-  });
-
   let nth = 0;
 
   for (const entry of core.history) {
@@ -54,8 +63,8 @@ function getSpokenRoll(core) {
     "десятый",
   ][nth];
   return numeralWord
-    ? `Кубик ${numeralWord} раз показал ${wordy.pretty().lastRoll}`
-    : `Кубик показал ${wordy.pretty().lastRoll}`;
+    ? `Кубик ${numeralWord} раз показал ${core.pretty().lastRoll}`
+    : `Кубик показал ${core.pretty().lastRoll}`;
 }
 
 const core = load();
