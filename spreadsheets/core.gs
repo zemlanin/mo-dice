@@ -1,8 +1,6 @@
 const R = (n) => parseInt(Math.random() * n);
 
 class Core {
-  static symbols = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
-
   constructor(options) {
     options = options || {};
 
@@ -31,6 +29,8 @@ class Core {
     this.history = [];
   }
 }
+
+Core.symbols = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
 
 // 1. shares namespace
 // 2. doesn't support `import`/`export` keywords nor dynamic `import()`

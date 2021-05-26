@@ -14,6 +14,7 @@ function ROLL(faces) {
   } else if (faces) {
     symbols = faces.toString().split("");
   }
+
   const core = new Core({
     symbols,
   });
